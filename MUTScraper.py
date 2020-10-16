@@ -39,7 +39,7 @@ def playersCSV():
         page_i = URL + str(i)
         player_page = requests.get(page_i)
         soup = bs(player_page.content, 'html.parser')
-        pattern = r"\s+(\d+)\s+(\S+(?: \S+)*)\s+(\w+)[^\w]+(\S+(?: \S+)*)[^\w]+(\w+)"
+        pattern = r"\s+(\d+)\s+(\S+(?: \S+)*)\s+(\w+)[^\w]+(\S+(?: \S+)*)[^\w]+([\w.]+)"
         for tag in soup.find_all('li', class_="player-listing__item"):
             # print(tag.text)
             ovr, name, pos, program, mp = re.findall(pattern, tag.text)[0]
@@ -47,14 +47,21 @@ def playersCSV():
             #     print(tag.text)
             ovr = int(ovr)
             if 'K' in mp:
-                mp = int(mp.replace('K', '')) * 1000
+                mp = float(mp.replace('K', '')) * 1000
             else:
                 try:
-                    mp = int(mp)
+                    mp = float(mp)
                 except:
                     mp = 'Unknown'
             output_writer.writerow([name, ovr, program, mp, pos])
 
+def playerTest():
+    URL = "https://www.muthead.com/21/players/?name__icontains=linval"
+    player_page = requests.get(URL)
+    soup = bs(player_page.content, 'html.parser')
+    for tag in soup.find_all('li', class_="player-listing__item"):
+        print(tag.text)
 
+# playerTest()
 
 playersCSV()
